@@ -1,0 +1,638 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JustShuo – read and watch anything in Chinese</title>
+<meta name="description" content="JustShuo puts pinyin over every word of any Chinese text, film or series. Click a word for its meaning, hear it said, and turn it into a flashcard. 20 graded fairy tales included. One payment of £29.99, no subscription.">
+<meta property="og:title" content="JustShuo – read and watch anything in Chinese">
+<meta property="og:description" content="Pinyin over every word, meanings at a click, flashcards and graded stories. One payment, no subscription.">
+<meta property="og:image" content="https://laowaidave.github.io/JustShuo/social.png">
+<meta property="og:url" content="https://laowaidave.github.io/JustShuo/">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" type="image/png" href="logo.png">
+<style>
+@font-face { font-family: "EB Garamond"; src: url("fonts/EBGaramond-Regular.ttf") format("truetype"); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: "EB Garamond"; src: url("fonts/EBGaramond-Italic.ttf") format("truetype"); font-weight: 400; font-style: italic; font-display: swap; }
+@font-face { font-family: "Lato"; src: url("fonts/Lato-Regular.ttf") format("truetype"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Lato"; src: url("fonts/Lato-Bold.ttf") format("truetype"); font-weight: 700; font-display: swap; }
+
+/* JustShuo's own Light and Dark themes (the Just family's colours, with JustShuo's gold) */
+:root {
+  --desk: #ECE9E3; --page: #FFFEFB; --panel: #F7F5F1; --ink: #2B2825; --muted: #6E6860; --faint: #B0AAA1;
+  --line: #E3DED6; --accent: #E0A526; --accent-hover: #CF961C; --on-accent: #2B2825; --accent-ink: #8A6209;
+  --accent-soft: #F5E7C6; --red: #D83231;
+  --shadow: 0 1px 2px rgba(43, 40, 37, .06), 0 12px 32px rgba(43, 40, 37, .10);
+  --serif: "EB Garamond", Georgia, "Times New Roman", serif;
+  --sans: "Lato", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --zh: "Noto Serif SC", "Source Han Serif SC", "Songti SC", "SimSun", serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --desk: #17191C; --page: #212428; --panel: #1C1E22; --ink: #DCD8D0; --muted: #9A958D; --faint: #5F5C57;
+    --line: #2F3237; --accent: #E8B84A; --accent-hover: #F0C866; --on-accent: #1B1B1B; --accent-ink: #E8B84A;
+    --accent-soft: #3A3322; --red: #F2847A;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 12px 32px rgba(0, 0, 0, .35);
+  }
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--desk); color: var(--ink); font: 17px/1.6 var(--sans); -webkit-font-smoothing: antialiased; }
+a { color: var(--accent-ink); }
+a:hover { color: var(--ink); }
+img { max-width: 100%; height: auto; }
+.wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+h1, h2, h3 { font-family: var(--serif); font-weight: 400; line-height: 1.15; margin: 0; }
+h1 { font-size: clamp(40px, 6vw, 64px); letter-spacing: -.01em; }
+h2 { font-size: clamp(32px, 4.2vw, 44px); }
+h3 { font-size: 25px; }
+.zh { font-family: var(--zh); }
+.small { font-size: 14px; color: var(--muted); }
+.skip { position: absolute; left: -9999px; }
+.skip:focus { left: 16px; top: 16px; background: var(--page); padding: 8px 12px; z-index: 10; }
+
+/* Header */
+.top { position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--desk) 88%, transparent);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+.top .wrap { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+.brand { display: flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none; font: 26px/1 var(--serif); }
+.brand:hover { color: var(--ink); }
+.brand img { width: 34px; height: 34px; border-radius: 8px; }
+nav { display: flex; align-items: center; gap: 22px; }
+nav a { color: var(--ink); text-decoration: none; font-size: 15px; }
+nav a:hover { color: var(--accent-ink); }
+
+/* Buttons */
+.button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 12px 22px;
+  border-radius: 10px; border: 1px solid var(--line); background: var(--page); color: var(--ink); text-decoration: none;
+  font: 700 16px/1.2 var(--sans); transition: background .15s, border-color .15s, transform .15s; }
+.button:hover { border-color: var(--faint); color: var(--ink); transform: translateY(-1px); }
+.button.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.button.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); color: var(--on-accent); }
+nav .button { min-height: 38px; padding: 8px 16px; font-size: 15px; }
+.actions { display: flex; flex-wrap: wrap; gap: 12px; margin: 30px 0 14px; }
+
+/* Hero */
+.hero { padding: 72px 0 88px; }
+.hero-text { text-align: center; max-width: 780px; margin: 0 auto; }
+.hero-text .actions { justify-content: center; }
+.lede { font-size: 20px; color: var(--muted); margin: 22px auto 0; max-width: 34em; }
+.hero h1 .zh { color: var(--red); }
+
+/* Screenshots: the app's own windows, framed */
+.shot { display: block; margin: 0 auto; border-radius: 10px; overflow: hidden; border: 1px solid var(--line);
+  box-shadow: var(--shadow); background: var(--page); line-height: 0; }
+.shot img { display: block; width: 100%; height: auto; }
+.hero .shot { margin-top: 56px; max-width: 1080px; }
+a.shot { cursor: zoom-in; }
+
+/* Take a look: one screenshot at a time */
+.tabs { display: none; flex-wrap: wrap; gap: 8px; margin: 0 0 28px; }
+.js .tabs { display: flex; }
+.tab { font: 700 15px/1.2 var(--sans); color: var(--ink); background: var(--page); border: 1px solid var(--line);
+  border-radius: 999px; padding: 10px 18px; cursor: pointer; }
+.tab:hover { border-color: var(--faint); }
+.tab[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.tab:focus-visible { outline: 3px solid var(--accent-soft); outline-offset: 2px; }
+.panel { margin: 0 0 56px; }
+.js .panel { margin: 0; }
+.panel figcaption { max-width: 40em; margin: 0 auto 22px; text-align: center; }
+.panel figcaption h3 { margin-bottom: 6px; }
+.panel figcaption p { margin: 0; color: var(--muted); }
+
+/* Sections */
+section { padding: 88px 0; }
+.alt { background: var(--panel); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.intro { max-width: 40em; margin-bottom: 44px; }
+.intro p { color: var(--muted); font-size: 19px; margin: 14px 0 0; }
+
+.features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+.feature { background: var(--page); border: 1px solid var(--line); border-radius: 12px; padding: 26px 26px 24px; }
+.feature h3 { margin-bottom: 10px; }
+.feature h3::before { content: ""; display: block; width: 28px; height: 3px; border-radius: 2px; background: var(--accent); margin-bottom: 16px; }
+.feature p { margin: 0; color: var(--muted); font-size: 16px; }
+
+.quiet { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; margin-top: 56px; padding-top: 40px; border-top: 1px solid var(--line); }
+.quiet h3 { font-size: 22px; margin-bottom: 6px; }
+.quiet p { margin: 0; color: var(--muted); font-size: 16px; }
+
+/* Fairy tales */
+.levels { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+.level { background: var(--page); border: 1px solid var(--line); border-radius: 12px; padding: 22px 22px 18px; }
+.level h3 { font: 700 14px/1.2 var(--sans); letter-spacing: .06em; text-transform: uppercase; color: var(--accent-ink); margin-bottom: 12px; }
+.level ul { list-style: none; padding: 0; margin: 0; }
+.level li { padding: 7px 0; border-top: 1px solid var(--line); }
+.level li:first-child { border-top: 0; }
+.level .zh { display: block; font-size: 21px; line-height: 1.3; }
+.level .en { display: block; font-size: 14px; color: var(--muted); }
+.level .free { font: 700 11px/1 var(--sans); letter-spacing: .05em; text-transform: uppercase; color: var(--on-accent);
+  background: var(--accent); border-radius: 999px; padding: 3px 7px; margin-left: 6px; vertical-align: 3px; }
+
+/* Price */
+.pricing { display: grid; grid-template-columns: 1.2fr 1fr; gap: 18px; align-items: stretch; }
+.card { background: var(--page); border: 1px solid var(--line); border-radius: 14px; padding: 34px; display: flex; flex-direction: column; }
+.card.main { border-color: var(--accent); box-shadow: var(--shadow); }
+.price { font: 60px/1 var(--serif); margin: 14px 0 4px; }
+.price small { font: 16px var(--sans); color: var(--muted); margin-left: 6px; }
+.card ul { list-style: none; padding: 0; margin: 20px 0 26px; }
+.card li { padding: 7px 0 7px 28px; position: relative; }
+.card li::before { content: ""; position: absolute; left: 4px; top: 15px; width: 12px; height: 7px; border-left: 2px solid var(--accent);
+  border-bottom: 2px solid var(--accent); transform: rotate(-45deg); }
+.card .actions { margin: auto 0 0; }
+.card p { color: var(--muted); margin: 12px 0 0; }
+
+/* Download */
+.downloads { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; max-width: 760px; }
+.dl { display: flex; gap: 18px; align-items: center; background: var(--page); border: 1px solid var(--line); border-radius: 14px; padding: 24px;
+  color: var(--ink); text-decoration: none; transition: border-color .15s, transform .15s; }
+a.dl:hover { border-color: var(--accent); color: var(--ink); transform: translateY(-1px); }
+.dl.mine { border-color: var(--accent); box-shadow: var(--shadow); }
+.dl svg { flex: none; width: 40px; height: 40px; fill: var(--ink); }
+.dl strong { display: block; font-size: 19px; }
+.dl span { display: block; font-size: 14px; color: var(--muted); }
+.dl.soon { opacity: .7; }
+.dl .go { margin-left: auto; font-weight: 700; color: var(--accent-ink); font-size: 15px; white-space: nowrap; }
+#version { margin: 0 0 22px; color: var(--muted); }
+details { max-width: 760px; margin-top: 24px; background: var(--page); border: 1px solid var(--line); border-radius: 12px; padding: 4px 22px; }
+summary { cursor: pointer; padding: 14px 0; font-weight: 700; }
+#notes { padding-bottom: 12px; color: var(--muted); font-size: 16px; }
+#notes ul { padding-left: 20px; margin: 0; }
+#notes li { margin: 0 0 10px; }
+.help { display: grid; grid-template-columns: repeat(2, 1fr); gap: 28px; max-width: 760px; margin-top: 40px; }
+.help h3 { font-size: 21px; margin-bottom: 6px; }
+.help p { margin: 0; color: var(--muted); font-size: 15px; }
+
+/* Footer */
+footer { padding: 56px 0 64px; }
+.sister { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 18px; background: var(--page);
+  border: 1px solid var(--line); border-radius: 14px; padding: 26px 30px; margin-bottom: 40px; }
+.sister h3 { font-size: 24px; }
+.sister p { margin: 4px 0 0; color: var(--muted); }
+.foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px 28px; font-size: 14px; color: var(--muted); }
+.foot a { color: var(--muted); }
+.foot a:hover { color: var(--accent-ink); }
+
+@media (max-width: 900px) {
+  .pricing { grid-template-columns: 1fr; }
+  .features, .quiet, .levels { grid-template-columns: 1fr 1fr; }
+  .hero { padding: 48px 0 64px; }
+  .hero .shot { margin-top: 40px; }
+}
+@media (max-width: 640px) {
+  .wrap { padding: 0 16px; }
+  nav a:not(.button) { display: none; }
+  .features, .quiet, .downloads, .help, .levels { grid-template-columns: 1fr; }
+  section { padding: 64px 0; }
+  .card { padding: 26px 22px; }
+  .lede { font-size: 18px; }
+  .shot { border-radius: 6px; }
+  .tab { padding: 8px 14px; font-size: 14px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .button, .dl { transition: none; }
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to the page</a>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#"><img src="logo.png" alt="" width="34" height="34">JustShuo</a>
+    <nav aria-label="Sections">
+      <a href="#features">Features</a>
+      <a href="#tour">Screenshots</a>
+      <a href="#stories">Fairy tales</a>
+      <a href="#price">Price</a>
+      <a class="button primary" href="#download">Download</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <section class="hero">
+    <div class="wrap">
+      <div class="hero-text">
+        <h1>Read real Chinese. <span class="zh">说</span> it with confidence.</h1>
+        <p class="lede">JustShuo puts pinyin over every word of any Chinese text, film or series. Click a word for its
+          meaning, hear it said, and turn it into a flashcard. Twenty fairy tales in easy Chinese are there to start
+          with.</p>
+        <div class="actions">
+          <a class="button primary" id="hero-download" href="#download">Download the free trial</a>
+          <a class="button" href="#price">Buy JustShuo · £29.99</a>
+        </div>
+        <p class="small" id="hero-note">For Windows · free trial · one payment, no subscription</p>
+      </div>
+      <a class="shot" href="screenshots/reader.png">
+        <img src="screenshots/reader.png" width="1583" height="979"
+          alt="JustShuo with the fairy tale 龟兔赛跑 (The Tortoise and the Hare) open: pinyin over every word, words coloured by how well they're known, and a word's meaning, HSK level and Add to Flashcards in the panel on the right">
+      </a>
+    </div>
+  </section>
+
+  <section class="alt" id="features">
+    <div class="wrap">
+      <div class="intro">
+        <h2>Everything you need to read Chinese. On your own terms.</h2>
+        <p>Bring anything you want to read or watch. JustShuo makes every word of it something you can look up,
+          hear and learn.</p>
+      </div>
+      <div class="features">
+        <div class="feature">
+          <h3>Pinyin over every word</h3>
+          <p>In tone colours, or hidden when you're ready. Simplified or traditional characters, whichever the text was
+            written in, and fonts made for reading.</p>
+        </div>
+        <div class="feature">
+          <h3>Click any word</h3>
+          <p>Its meanings from a 125,000-word dictionary, its HSK level, the words it's part of, and a natural voice
+            that says it, all without leaving the page.</p>
+        </div>
+        <div class="feature">
+          <h3>Films and series</h3>
+          <p>Open MP4, MKV, MOV, WebM, AVI or WMV videos with Chinese subtitles. Every line becomes clickable words with
+            pinyin, the word being said lights up, and one key repeats a line.</p>
+        </div>
+        <div class="feature">
+          <h3>Flashcards that work</h3>
+          <p>Add a word or a whole sentence with one key. Reviews are spaced by FSRS, the scheduler serious learners
+            use, and your cards export to Anki.</p>
+        </div>
+        <div class="feature">
+          <h3>Know what you know</h3>
+          <p>Words are coloured new, learning or known, and every text shows how much of it you can read, so you can
+            choose what's right for you.</p>
+        </div>
+        <div class="feature">
+          <h3>Fairy tales in easy Chinese</h3>
+          <p>Twenty classic stories retold for learners, from HSK 1 to HSK 5: <span class="zh">龟兔赛跑</span>,
+            <span class="zh">小红帽</span>, <span class="zh">灰姑娘</span>, <span class="zh">嫦娥奔月</span> and more.</p>
+        </div>
+        <div class="feature">
+          <h3>A dictionary that understands you</h3>
+          <p>Look up English, Chinese or pinyin, with or without tones. Paste a sentence to see it word by word, with
+            pinyin over each one.</p>
+        </div>
+        <div class="feature">
+          <h3>Your progress at a glance</h3>
+          <p>Words known and learning, your streak, reviews over the last weeks, and a rough HSK level, with your words
+            in every level.</p>
+        </div>
+        <div class="feature">
+          <h3>Bring your own</h3>
+          <p>Import text files, e-books (EPUB), PDFs, Word documents and saved web pages, or paste in anything. Long
+            books are split into chapters, pictures and all.</p>
+        </div>
+      </div>
+
+      <div class="quiet">
+        <div>
+          <h3>Private and offline</h3>
+          <p>Your texts, videos and study stay on your computer. No account, no tracking, and no internet needed to
+            read or study.</p>
+        </div>
+        <div>
+          <h3>A natural voice</h3>
+          <p>Hear any word or sentence said by a natural Mandarin voice that runs on your computer, or by Windows'
+            own Chinese voices.</p>
+        </div>
+        <div>
+          <h3>Updates included</h3>
+          <p>JustShuo updates itself. A JustShuo licence covers every 1.x update, at no extra cost.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="tour">
+    <div class="wrap">
+      <div class="intro">
+        <h2>Take a look</h2>
+        <p>These are real screenshots of JustShuo, with the sample story, film and study history that come with it.</p>
+      </div>
+      <div class="tabs" role="tablist" aria-label="Screenshots">
+        <button class="tab" role="tab" id="tab-player" aria-controls="shot-player">Films and series</button>
+        <button class="tab" role="tab" id="tab-home" aria-controls="shot-home">Your progress</button>
+        <button class="tab" role="tab" id="tab-dictionary" aria-controls="shot-dictionary">Dictionary</button>
+        <button class="tab" role="tab" id="tab-review" aria-controls="shot-review">Flashcards</button>
+        <button class="tab" role="tab" id="tab-vocab" aria-controls="shot-vocab">Vocabulary</button>
+        <button class="tab" role="tab" id="tab-dark" aria-controls="shot-dark">Dark theme</button>
+      </div>
+
+      <figure class="panel" id="shot-player" role="tabpanel" aria-labelledby="tab-player">
+        <figcaption><h3>Films and series</h3><p>Subtitles become words you can click, with pinyin over them and the
+          translation underneath. Click a word for its meaning, or open the whole script beside the picture.</p></figcaption>
+        <a class="shot" href="screenshots/player.png" style="max-width: 1080px">
+          <img src="screenshots/player.png" width="1583" height="979" loading="lazy" decoding="async"
+            alt="The video player: a scene from the sample film, its subtitle line with pinyin over every word, the English translation, and the meaning of 严寒 (bitter cold) on the right">
+        </a>
+      </figure>
+      <figure class="panel" id="shot-home" role="tabpanel" aria-labelledby="tab-home">
+        <figcaption><h3>Your progress</h3><p>Cards to review, words known and learning, your streak, and roughly where
+          you are in the HSK levels.</p></figcaption>
+        <a class="shot" href="screenshots/home.png" style="max-width: 1080px">
+          <img src="screenshots/home.png" width="1583" height="1304" loading="lazy" decoding="async"
+            alt="Home: known words and words learning, the streak, Around HSK 2 with a bar for each HSK level, the last four weeks of reviews, and texts to read next">
+        </a>
+      </figure>
+      <figure class="panel" id="shot-dictionary" role="tabpanel" aria-labelledby="tab-dictionary">
+        <figcaption><h3>Dictionary</h3><p>Search in English, Chinese or pinyin, or paste a sentence to read it word by
+          word.</p></figcaption>
+        <a class="shot" href="screenshots/dictionary.png" style="max-width: 1080px">
+          <img src="screenshots/dictionary.png" width="1583" height="979" loading="lazy" decoding="async"
+            alt="The Dictionary page with the sentence 我想看懂中文电影 shown word by word, pinyin over each word, and each word's meanings below">
+        </a>
+      </figure>
+      <figure class="panel" id="shot-review" role="tabpanel" aria-labelledby="tab-review">
+        <figcaption><h3>Flashcards</h3><p>Each card keeps the sentence you met the word in, read aloud when you turn
+          it over.</p></figcaption>
+        <a class="shot" href="screenshots/review.png" style="max-width: 1080px">
+          <img src="screenshots/review.png" width="1583" height="979" loading="lazy" decoding="async"
+            alt="A flashcard turned over: the word, its pinyin and meaning, the sentence it came from, and buttons for Again, Hard, Good and Easy">
+        </a>
+      </figure>
+      <figure class="panel" id="shot-vocab" role="tabpanel" aria-labelledby="tab-vocab">
+        <figcaption><h3>Vocabulary</h3><p>The words to learn next, from your own texts or an HSK level, and every word
+          you're learning or know.</p></figcaption>
+        <a class="shot" href="screenshots/vocabulary.png" style="max-width: 1080px">
+          <img src="screenshots/vocabulary.png" width="1583" height="979" loading="lazy" decoding="async"
+            alt="The Vocabulary page: HSK 4 words to learn, each with its pinyin, meaning and how often it appears in your texts">
+        </a>
+      </figure>
+      <figure class="panel" id="shot-dark" role="tabpanel" aria-labelledby="tab-dark">
+        <figcaption><h3>Light, Sepia or Dark</h3><p>Read in the colours that suit you, day or night.</p></figcaption>
+        <a class="shot" href="screenshots/dark.png" style="max-width: 1080px">
+          <img src="screenshots/dark.png" width="1583" height="979" loading="lazy" decoding="async"
+            alt="The Dark theme: Lu Xun's 故乡 with pinyin and word colours, and a word's meaning in the panel on the right">
+        </a>
+      </figure>
+    </div>
+  </section>
+
+  <section class="alt" id="stories">
+    <div class="wrap">
+      <div class="intro">
+        <h2>Twenty fairy tales in easy Chinese</h2>
+        <p>Classic stories and fables retold for learners, five at each level. Nearly every word is from the level's HSK
+          lists, so you can read them with confidence, and they work like everything else in JustShuo: pinyin,
+          look-ups, the natural voice and flashcards. The trial has <span class="zh">龟兔赛跑</span>; a licence adds the
+          rest.</p>
+      </div>
+      <div class="levels">
+        <div class="level">
+          <h3>HSK 1–2</h3>
+          <ul>
+            <li><span class="zh">龟兔赛跑<span class="free">Free</span></span><span class="en">The Tortoise and the Hare</span></li>
+            <li><span class="zh">狼来了</span><span class="en">The Boy Who Cried Wolf</span></li>
+            <li><span class="zh">守株待兔</span><span class="en">Waiting by the Tree for a Hare</span></li>
+            <li><span class="zh">三只小猪</span><span class="en">The Three Little Pigs</span></li>
+            <li><span class="zh">拔苗助长</span><span class="en">Pulling Up the Shoots</span></li>
+          </ul>
+        </div>
+        <div class="level">
+          <h3>HSK 2–3</h3>
+          <ul>
+            <li><span class="zh">狐狸和葡萄</span><span class="en">The Fox and the Grapes</span></li>
+            <li><span class="zh">井底之蛙</span><span class="en">The Frog in the Well</span></li>
+            <li><span class="zh">狐假虎威</span><span class="en">The Fox and the Tiger</span></li>
+            <li><span class="zh">城里老鼠和乡下老鼠</span><span class="en">The Town Mouse and the Country Mouse</span></li>
+            <li><span class="zh">小红帽</span><span class="en">Little Red Riding Hood</span></li>
+          </ul>
+        </div>
+        <div class="level">
+          <h3>HSK 3–4</h3>
+          <ul>
+            <li><span class="zh">金发姑娘和三只熊</span><span class="en">Goldilocks and the Three Bears</span></li>
+            <li><span class="zh">丑小鸭</span><span class="en">The Ugly Duckling</span></li>
+            <li><span class="zh">青蛙王子</span><span class="en">The Frog Prince</span></li>
+            <li><span class="zh">皇帝的新衣</span><span class="en">The Emperor's New Clothes</span></li>
+            <li><span class="zh">嫦娥奔月</span><span class="en">Chang'e Flies to the Moon</span></li>
+          </ul>
+        </div>
+        <div class="level">
+          <h3>HSK 4–5</h3>
+          <ul>
+            <li><span class="zh">愚公移山</span><span class="en">The Old Man Who Moved the Mountains</span></li>
+            <li><span class="zh">杰克与魔豆</span><span class="en">Jack and the Beanstalk</span></li>
+            <li><span class="zh">牛郎织女</span><span class="en">The Cowherd and the Weaver Girl</span></li>
+            <li><span class="zh">灰姑娘</span><span class="en">Cinderella</span></li>
+            <li><span class="zh">卖火柴的小女孩</span><span class="en">The Little Match Girl</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="price">
+    <div class="wrap">
+      <div class="intro">
+        <h2>One payment. Every JustShuo 1 update.</h2>
+        <p>No subscription, no monthly fee. Buy it once and it's yours.</p>
+      </div>
+      <div class="pricing">
+        <div class="card main">
+          <h3>JustShuo for Windows</h3>
+          <div class="price">£29.99<small>once</small></div>
+          <ul>
+            <li>Read and watch anything of your own</li>
+            <li>All twenty graded fairy tales</li>
+            <li>Every JustShuo 1 update included</li>
+            <li>For one person on Windows; move your licence when you change computers</li>
+            <li>Payment, VAT and your licence key handled by Polar</li>
+          </ul>
+          <div class="actions">
+            <a class="button primary" href="https://buy.polar.sh/polar_cl_iGGbBd7wX3BZnDE7QPKEJJCSvk2m4fWxtVPnL28vCgB">Buy for Windows</a>
+            <a class="button" id="buy-mac" href="https://buy.polar.sh/polar_cl_AMF6INx9EmgMNbfs5Byp5ERl8kDaockUFRBnh1orB59" hidden>Buy for Mac</a>
+          </div>
+          <p class="small" id="mac-price-note">The Mac version is coming soon.</p>
+        </div>
+        <div class="card">
+          <h3>Try it first</h3>
+          <div class="price">Free<small>trial</small></div>
+          <p>Try everything with the sample text (Lu Xun's <span class="zh">故乡</span>), the sample video and the fairy
+            tale <span class="zh">龟兔赛跑</span>: pinyin, look-ups, the voices, flashcards and statistics.</p>
+          <p>When you buy, type your licence key into JustShuo to add your own texts and videos and the other nineteen
+            fairy tales. Everything you've studied stays.</p>
+          <div class="actions" style="margin-top: 26px">
+            <a class="button" href="#download">Download the free trial</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="alt" id="download">
+    <div class="wrap">
+      <div class="intro" style="margin-bottom: 26px">
+        <h2>Download JustShuo</h2>
+      </div>
+      <p id="version">The latest version, with the free trial built in.</p>
+      <div class="downloads">
+        <a class="dl" id="dl-windows" href="https://github.com/laowaidave/JustShuo/releases/latest">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5.1 10.4 4v7.1H3V5.1Zm0 13.8 7.4 1.1v-7H3v5.9Zm8.3 1.2L21 21.5v-8.4h-9.7v7Zm0-16.2v7.2H21V2.5l-9.7 1.4Z"/></svg>
+          <div><strong>Windows</strong><span id="win-detail">Windows 10 or 11, 64-bit</span></div>
+          <span class="go">Download</span>
+        </a>
+        <div class="dl soon" id="dl-mac">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.4 12.6c0-2.4 2-3.6 2.1-3.7-1.1-1.7-2.9-1.9-3.5-1.9-1.5-.2-2.9.9-3.7.9-.8 0-1.9-.9-3.2-.8-1.6 0-3.2 1-4 2.5-1.7 3-.4 7.4 1.2 9.8.8 1.2 1.8 2.5 3 2.4 1.2 0 1.7-.8 3.1-.8 1.5 0 1.9.8 3.2.8 1.3 0 2.2-1.2 3-2.4.9-1.4 1.3-2.7 1.3-2.8 0 0-2.5-1-2.5-4ZM14 5.4c.7-.8 1.1-1.9 1-3-1 0-2.1.7-2.8 1.5-.6.7-1.2 1.8-1 2.9 1 .1 2.1-.6 2.8-1.4Z"/></svg>
+          <div><strong>Mac</strong><span id="mac-detail">Coming soon</span></div>
+        </div>
+      </div>
+      <details id="whats-new" hidden>
+        <summary id="whats-new-title">What's new</summary>
+        <div id="notes"></div>
+      </details>
+      <div class="help">
+        <div>
+          <h3>Opening it the first time</h3>
+          <p>JustShuo's installer isn't code-signed yet, so Windows may say <em>Windows protected your PC</em>.
+            Click <strong>More info</strong>, then <strong>Run anyway</strong>. It installs just for you, with no
+            administrator password.</p>
+        </div>
+        <div>
+          <h3>Every version</h3>
+          <p>Every release and its files are listed on
+            <a href="https://github.com/laowaidave/JustShuo/releases">JustShuo's releases page</a>.
+            Once installed, JustShuo keeps itself up to date.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="sister">
+      <div>
+        <h3>Also from Six Kingdoms Publishing: JustWrite</h3>
+        <p>Writing a book? JustWrite is a calm, distraction-free place to write it, from the same makers as JustShuo.</p>
+      </div>
+      <a class="button" href="https://laowaidave.github.io/JustWrite/">Meet JustWrite</a>
+    </div>
+    <div class="foot">
+      <span>© <span id="year">2026</span> Six Kingdoms Publishing</span>
+      <span><a href="https://polar.sh/six-kingdoms-publishing/portal">Your licence and receipts</a></span>
+      <span>Set in EB Garamond and Lato (<a href="fonts/EBGaramond-OFL.txt">licence</a>, <a href="fonts/Lato-OFL.txt">licence</a>)</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Screenshots: one at a time, chosen with the tabs (without JavaScript they're all shown, one after another).
+(function () {
+  var tabs = Array.prototype.slice.call(document.querySelectorAll(".tab"));
+  if (!tabs.length) return;
+  document.documentElement.classList.add("js");
+  function choose(tab, focus) {
+    tabs.forEach(function (t) {
+      var on = t === tab;
+      t.setAttribute("aria-selected", on ? "true" : "false");
+      t.tabIndex = on ? 0 : -1;
+      document.getElementById(t.getAttribute("aria-controls")).hidden = !on;
+    });
+    if (focus) tab.focus();
+  }
+  tabs.forEach(function (t, i) {
+    t.addEventListener("click", function () { choose(t, false); });
+    t.addEventListener("keydown", function (e) {
+      var next = e.key === "ArrowRight" ? i + 1 : e.key === "ArrowLeft" ? i - 1
+        : e.key === "Home" ? 0 : e.key === "End" ? tabs.length - 1 : null;
+      if (next === null) return;
+      e.preventDefault();
+      choose(tabs[(next + tabs.length) % tabs.length], true);
+    });
+  });
+  choose(tabs[0], false);
+})();
+
+// Fill in the download links from the update file JustShuo itself reads (update-1.json, published with each
+// release). Without it, the links go to the GitHub releases page.
+(function () {
+  document.getElementById("year").textContent = new Date().getFullYear();
+  var ua = navigator.userAgent || "";
+  var system = /Mac|iPhone|iPad/.test(ua) ? "mac" : /Windows/.test(ua) ? "windows" : "";
+
+  function mb(bytes) {
+    return bytes > 0 ? Math.max(1, Math.round(bytes / 1048576)) + " MB" : "";
+  }
+
+  function released(text) {
+    var d = new Date(text + "T12:00:00");
+    return isNaN(d) ? "" : d.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+  }
+
+  function showNotes(version, notes) {
+    var box = document.getElementById("notes");
+    var list = null;
+    notes.split(/\n+/).forEach(function (line) {
+      line = line.trim();
+      if (!line) return;
+      if (line.charAt(0) === "•" || line.charAt(0) === "-") {
+        if (!list) list = box.appendChild(document.createElement("ul"));
+        list.appendChild(document.createElement("li")).textContent = line.replace(/^[•-]\s*/, "");
+      } else {
+        list = null;
+        box.appendChild(document.createElement("p")).textContent = line;
+      }
+    });
+    document.getElementById("whats-new-title").textContent = "What's new in " + version;
+    document.getElementById("whats-new").hidden = false;
+  }
+
+  fetch("update-1.json", { cache: "no-cache" })
+    .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(function (envelope) {
+      var bytes = Uint8Array.from(atob(envelope.payload), function (c) { return c.charCodeAt(0); });
+      var p = JSON.parse(new TextDecoder().decode(bytes));
+      var d = p.downloads || {};
+      var when = released(p.released);
+      document.getElementById("version").textContent = "JustShuo " + p.version + (when ? ", released " + when : "")
+        + ". The free trial is built in.";
+
+      if (d.windows) {
+        document.getElementById("dl-windows").href = d.windows.url;
+        document.getElementById("win-detail").textContent = "Windows 10 or 11, 64-bit · " + mb(d.windows.size);
+      }
+      // The Mac: Apple Silicon and Intel have a download each; the button suits this Mac where it can tell.
+      var mac = d["mac-arm64"] || d["mac-x64"];
+      if (mac) {
+        var old = document.getElementById("dl-mac");
+        var link = document.createElement("a");
+        link.className = "dl";
+        link.id = "dl-mac";
+        link.href = mac.url;
+        link.innerHTML = old.innerHTML;
+        old.replaceWith(link);
+        var both = d["mac-arm64"] && d["mac-x64"];
+        document.getElementById("mac-detail").textContent = (both ? "Apple Silicon · " : "Disk image · ") + mb(mac.size);
+        link.appendChild(document.createElement("span")).className = "go";
+        link.lastChild.textContent = "Download";
+        if (both) {
+          var intel = document.createElement("p");
+          intel.className = "small";
+          intel.innerHTML = "For a Mac with an Intel processor: <a href=\"" + d["mac-x64"].url + "\">download the Intel version</a>.";
+          document.querySelector(".downloads").after(intel);
+        }
+        document.getElementById("buy-mac").hidden = false;
+        document.getElementById("mac-price-note").hidden = true;
+        document.getElementById("hero-note").textContent = "For Windows and Mac · free trial · one payment, no subscription";
+        d.mac = mac;
+      }
+
+      var mine = system && d[system];
+      if (mine) {
+        document.getElementById("dl-" + system).classList.add("mine");
+        var hero = document.getElementById("hero-download");
+        hero.href = mine.url;
+        hero.textContent = "Download for " + (system === "mac" ? "Mac" : "Windows");
+      }
+      if (p.notes) showNotes(p.version, p.notes);
+    })
+    .catch(function () { /* keep the links to the releases page */ });
+})();
+</script>
+</body>
+</html>
